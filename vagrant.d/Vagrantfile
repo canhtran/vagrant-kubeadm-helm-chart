@@ -11,7 +11,4 @@ Vagrant.configure("2") do |config|
   end
   config.vm.provision "docker"
   config.vm.provision "shell", path: "kube-install.sh"
-  config.vm.provision "shell", inline: <<-SHELL
-     echo "sudo su -" >> .bashrc
-  SHELL
 end
