@@ -12,22 +12,21 @@ apt-mark hold kubelet kubeadm kubectl
 swapoff -a
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
+# Configure cgroup driver used by kubelet on Master Node
 sed -i '0,/ExecStart=/s//Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"\n&/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
-IPADDR=`ifconfig eth1 | grep Mask | awk '{print $2}'| cut -f2 -d:`
-echo This VM has IP address $IPADDR
+IPADDRESS=`ifconfig eth1 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1`
 
 # Set up Kubernetes
-NODENAME=$(hostname -s)
-kubeadm init --apiserver-cert-extra-sans=$IPADDR  --node-name $NODENAME
+kubeadm init --apiserver-cert-extra-sans=$IPADDRESS  --node-name $(hostname -s)
 
 # Set up admin creds for the vagrant user
-echo Copying credentials to /home/vagrant...
-sudo mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+sudo --user=vagrant mkdir -p /home/vagrant/.kube
+cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+chown $(id -u vagrant):$(id -g vagrant) /home/vagrant/.kube/config
 
 # Installing a pod network add-on
+export KUBECONFIG=~vagrant/.kube/config
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
 # Master Isolation
