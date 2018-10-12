@@ -20,7 +20,7 @@ IPADDRESS=`ifconfig eth1 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1`
 # Set up Kubernetes
 kubeadm init --apiserver-cert-extra-sans=$IPADDRESS  --node-name $(hostname -s)
 
-# Set up admin creds for the vagrant user
+# Make kubectl work for your non-root user
 sudo --user=vagrant mkdir -p /home/vagrant/.kube
 cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown $(id -u vagrant):$(id -g vagrant) /home/vagrant/.kube/config
