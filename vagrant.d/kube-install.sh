@@ -10,11 +10,11 @@ apt-mark hold kubelet kubeadm kubectl
 
 # kubelet requires swap off
 swapoff -a
-sudo sed-i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 sed -i '0,/ExecStart=/s//Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"\n&/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
-IPADDR=`ifconfig enp0s8 | grep Mask | awk '{print $2}'| cut -f2 -d:`
+IPADDR=`ifconfig eth1 | grep Mask | awk '{print $2}'| cut -f2 -d:`
 echo This VM has IP address $IPADDR
 
 # Set up Kubernetes
@@ -23,8 +23,13 @@ kubeadm init --apiserver-cert-extra-sans=$IPADDR  --node-name $NODENAME
 
 # Set up admin creds for the vagrant user
 echo Copying credentials to /home/vagrant...
-sudo --user=vagrant mkdir -p /home/vagrant/.kube
-cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-chown $(id -u vagrant):$(id -g vagrant) /home/vagrant/.kube/config
+sudo mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
 
+# Installing a pod network add-on
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+# Master Isolation
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
