@@ -3,7 +3,7 @@ from flask import (
     current_app,
     Blueprint,
     jsonify,
-    make_reponse,
+    make_response,
     request
 )
 from util import predict_model

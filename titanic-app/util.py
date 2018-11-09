@@ -1,5 +1,6 @@
 import os
 import pickle
+from contextlib import contextmanager
 
 
 def read_model_from_pickle(path):
@@ -16,6 +17,6 @@ def predict_model(model,  input):
     try:
         result = model.predict(input)
         yield result
-    except Exception as ex
+    except Exception as ex:
         yield None
 

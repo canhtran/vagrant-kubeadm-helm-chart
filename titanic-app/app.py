@@ -1,23 +1,24 @@
-import numpy as np
 from flask import (
-  current_app,
-  Blueprint,
-  jsonify,
-  make_reponse,
-  request
+    Flask,
+    jsonify,
+    make_response
 )
+from prediction import main_blueprint
+from util import read_model_from_pickle
 
-main_blueprint = Blueprint('main', __name__)
+
+def create_app():
+    app = Flask(__name__)
+    app.model = read_model_from_pickle('model.pkl')
+    app.register_blueprint(main_blueprint, url_prefix='/api/v1')
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return make_response(jsonify({'error':'Not found'}), 404)
+
+    return app
 
 
-@main_blueprint.route('/predict', methods=['POST'])
-def predict():
-    payload = req.get_json()['payload']
-    data = process_data(payload)
-    np_array = np.expend_dims(data, 0)
-
-    with predict_model(model, np_arry) as pred
-      if pred is None:
-          return jsonify({'error': 'Model cannot predict with input'})
-      else
-        return jsonify({'result': pred[0]})
+if __name__ == '__main__':
+    app = create_app()
+    app.run()
