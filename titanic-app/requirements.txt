@@ -1,0 +1,10 @@
+# Main
+Flask==1.0.2
+gunicorn==19.4.5
+flask-cors==3.0.2
+Flask-SQLAlchemy===2.1
+Flask-Migrate==1.8.0
+
+# Data science package
+scikit-learn==0.19.1
+scipy==1.0.0
