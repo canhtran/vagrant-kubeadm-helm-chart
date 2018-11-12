@@ -1,19 +1,18 @@
+{{- $componentName := .Values.componentName }}
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "helm-chart.fullname" . }}
+  name: {{ template "fullname" . }}
   labels:
-    app: {{ template "helm-chart.name" . }}
-    chart: {{ template "helm-chart.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "labels.standard" $ | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.service.internalPort }}
       protocol: TCP
-      name: http
+      name: {{ .Values.service.name }}
   selector:
-    app: {{ template "helm-chart.name" . }}
-    release: {{ .Release.Name }}
+    app: {{ template "fullname" . }}
+    component: {{ $componentName }}
+

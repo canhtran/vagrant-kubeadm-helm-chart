@@ -1,51 +1,37 @@
+{{- $componentName := .Values.componentName }}
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "helm-chart.fullname" . }}
+  name: {{ template "fullname" . }}
   labels:
-    app: {{ template "helm-chart.name" . }}
-    chart: {{ template "helm-chart.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{ include "labels.standard" $ | indent 4 }}
+  component: {{ $componentName }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "helm-chart.name" . }}
-      release: {{ .Release.Name }}
+      app: {{ template "fullname" . }}
+      component: {{ $componentName }}
   template:
     metadata:
       labels:
-        app: {{ template "helm-chart.name" . }}
-        release: {{ .Release.Name }}
+        {{- include "labels.standard" $ | indent 8 }}
+        component: {{ $componentName }}
     spec:
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ $componentName }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
-              protocol: TCP
+              containerPort: {{ .Values.service.internalPort }}
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /heartbeat
+              port: {{ .Values.service.internalPort }}
           readinessProbe:
             httpGet:
-              path: /
-              port: http
-          resources:
-{{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+              path: /heartbeat
+              port: {{ .Values.service.internalPort }}
+          resources: {{ toYaml .Values.resources | indent 12 }}
+
