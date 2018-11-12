@@ -13,11 +13,11 @@ main_blueprint = Blueprint('main', __name__)
 
 @main_blueprint.route('/predict', methods=['POST'])
 def predict():
-    payload = req.get_json()['payload']
+    payload = request.get_json()['payload']
     data = process_data(payload)
-    np_array = np.expend_dims(data, 0)
+    np_array = np.expand_dims(data, 0)
 
-    with predict_model(model, np_arry) as pred:
+    with predict_model(current_app.model, np_array) as pred:
         if pred is None:
             return jsonify({'error': 'Model cannot predict with input'})
         else:
