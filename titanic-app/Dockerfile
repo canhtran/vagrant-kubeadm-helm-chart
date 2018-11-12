@@ -20,6 +20,7 @@ COPY app.py $APP_HOME
 COPY prediction.py $APP_HOME
 COPY util.py $APP_HOME
 COPY model.pkl $APP_HOME
+COPY heartbeat.py $APP_HOME
 
 CMD gunicorn -w 3 -b 0.0.0.0:5000 --timeout=120 --reload "app:create_app()"
 
