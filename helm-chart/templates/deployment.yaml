@@ -1,0 +1,37 @@
+{{- $componentName := .Values.componentName }}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    {{ include "labels.standard" $ | indent 4 }}
+  component: {{ $componentName }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+      component: {{ $componentName }}
+  template:
+    metadata:
+      labels:
+        {{- include "labels.standard" $ | indent 8 }}
+        component: {{ $componentName }}
+    spec:
+      containers:
+        - name: {{ $componentName }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.internalPort }}
+          livenessProbe:
+            httpGet:
+              path: /heartbeat
+              port: {{ .Values.service.internalPort }}
+          readinessProbe:
+            httpGet:
+              path: /heartbeat
+              port: {{ .Values.service.internalPort }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+
