@@ -33,5 +33,5 @@ spec:
             httpGet:
               path: /heartbeat
               port: {{ .Values.service.internalPort }}
-          resources: {{ toYaml .Values.resources | indent 12 }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
 
