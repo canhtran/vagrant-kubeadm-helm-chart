@@ -9,7 +9,7 @@ from flask import (
 
 app = Flask(__name__)
 with open('model.pkl', 'rb') as handle:
-    app.model = pickle.load(handle,  encoding='latin1')
+    app.model = pickle.load(handle)
 
 
 @app.route('/heartbeat', methods=['GET'])
