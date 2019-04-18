@@ -1,26 +1,33 @@
+import pickle
+import numpy as np
 from flask import (
     Flask,
     jsonify,
-    make_response
+    request
 )
-from prediction import main_blueprint
-from util import read_model_from_pickle
-from heartbeat import heartbeat_blueprint
 
 
-def create_app():
-    app = Flask(__name__)
-    app.model = read_model_from_pickle('model.pkl')
-    app.register_blueprint(main_blueprint, url_prefix='/api/v1')
-    app.register_blueprint(heartbeat_blueprint)
-
-    @app.errorhandler(404)
-    def not_found(error):
-        return make_response(jsonify({'error':'Not found'}), 404)
-
-    return app
+app = Flask(__name__)
+with open('model.pkl', 'rb') as handle:
+    app.model = pickle.load(handle,  encoding='latin1')
 
 
-if __name__ == '__main__':
-    app = create_app()
+@app.route('/heartbeat', methods=['GET'])
+def heartbeat():
+    return 'ok'
+
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    payload = request.get_json()
+    np_array = np.expand_dims(list(payload.values()), 0)
+
+    pred = app.model.predict(np_array)
+    if pred is None:
+        return jsonify({'error': 'Model cannot predict with input'})
+    else:
+        return jsonify({'result': str(pred[0])})
+
+
+if __name__ == "__main__":
     app.run()
