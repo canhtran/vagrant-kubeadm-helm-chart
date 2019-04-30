@@ -17,7 +17,7 @@ def heartbeat():
     return 'ok'
 
 
-@app.route('/predict', methods=['POST'])
+@app.route('api/predict/v1', methods=['POST'])
 def predict():
     payload = request.get_json()
     np_array = np.expand_dims(list(payload.values()), 0)
