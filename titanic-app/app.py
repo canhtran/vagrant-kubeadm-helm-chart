@@ -26,7 +26,7 @@ def predict():
     if pred is None:
         return jsonify({'error': 'Model cannot predict with input'})
     else:
-        return jsonify({'result': str(pred[0])})
+        return jsonify(result=pred[0].item())
 
 
 if __name__ == "__main__":
