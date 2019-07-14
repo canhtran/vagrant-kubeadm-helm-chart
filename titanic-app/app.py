@@ -17,11 +17,10 @@ def heartbeat():
     return 'ok'
 
 
-@app.route('api/predict/v1', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
     payload = request.get_json()
     np_array = np.expand_dims(list(payload.values()), 0)
-
     pred = app.model.predict(np_array)
     if pred is None:
         return jsonify({'error': 'Model cannot predict with input'})
@@ -30,4 +29,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
