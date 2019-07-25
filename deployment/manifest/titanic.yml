@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: titanic-app
+  labels:
+    app: titanic-app
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: titanic-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: titanic-app
+    spec:
+      containers:
+      - name: titanic-app
+        image: canhtran/titanic-app-demo:latest
+        ports:
+        - containerPort: 5000
+  
